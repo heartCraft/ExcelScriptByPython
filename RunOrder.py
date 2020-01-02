@@ -1,5 +1,13 @@
-import sys
 import xlwings as xw
+import tkinter
+from tkinter import filedialog
+
+root= tkinter.Tk()
+root.withdraw()
+
+orderPath=filedialog.askopenfilename(title='选择runningOrder表',filetypes=[('excel','*.xls*')])
+storePath=filedialog.askopenfilename(title='选择库存表',filetypes=[('excel','*.xls*')])
+deliveryPath=filedialog.askopenfilename(title='选择运输汇总表',filetypes=[('excel','*.xls*')])
 
 # 打开excel文件
 app=xw.App(visible=True,add_book=False)
@@ -7,15 +15,12 @@ app.display_alerts=False
 app.screen_updating=False
 
 # 打开三个excel文件获取数据
-print('start!')
-orderBook=app.books.open(r'C:\Users\Alisa\Desktop\配件交期自动化\runningOrder.xls')
-orderSheet=orderBook.sheets[0]
-
-storeBook=app.books.open(r'C:\Users\Alisa\Desktop\配件交期自动化\库存.xls')
-
-deliveryBook=app.books.open(r'C:\Users\Alisa\Desktop\配件交期自动化\运输汇总.xlsx')
+orderBook=app.books.open(orderPath)
+storeBook=app.books.open(storePath)
+deliveryBook=app.books.open(deliveryPath)
 
 try:
+    orderSheet=orderBook.sheets[0]
     # 订单表数据读取
     orderTitle=orderSheet.range('a1').expand('right').value
     orderData=orderSheet.range('a1').expand('table').value[1:]
@@ -98,7 +103,6 @@ try:
             item.append(None)
 
     # 保存
-    print('saving!!!')
     orderSheet.range('a1').expand('table').clear()
     orderSheet.range('a1').expand('right').value=orderTitle
     orderSheet.range('a2').expand('table').value=orderData
@@ -108,9 +112,3 @@ finally:
     storeBook.close()
     deliveryBook.close()
     app.quit()
-    print('ok!')
-
-
-
-
-
